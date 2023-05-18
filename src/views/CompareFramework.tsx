@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { ChartData, ChartOptions } from "chart.js";
+import { ChartData } from "chart.js";
+import 'chart.js/auto';
 import { Bar } from "react-chartjs-2";
 import { useQueryParam } from "use-query-params";
 import { isMobile } from "react-device-detect";
@@ -19,7 +20,7 @@ interface Props {
   benchmarks: BenchmarkDataSet[];
 }
 
-type ChartsData = (ComparedMetric & { chartData: ChartData })[];
+type ChartsData = (ComparedMetric & { chartData: ChartData<"bar"> })[];
 
 function CompareFramework({ benchmarks }: Props) {
   const [charts, setCharts] = useState<ChartsData>([]);
@@ -122,7 +123,6 @@ function CompareFramework({ benchmarks }: Props) {
               </a>
             </h4>
             <Bar
-              type="bar"
               data={c.chartData}
               height={isMobile ? 250 : 100}
               options={
@@ -146,7 +146,7 @@ function CompareFramework({ benchmarks }: Props) {
                       mode: isMobile ? "index" : "nearest",
                     },
                   },
-                } as ChartOptions
+                }
               }
             />
           </div>

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import Select from "react-select";
 import DataTable, { TableColumn } from "react-data-table-component";
 import { isMobile } from "react-device-detect";
-import ReactTooltip from "react-tooltip";
+import { Tooltip } from 'react-tooltip';
 import {
   BooleanParam,
   StringParam,
@@ -63,12 +63,12 @@ const staticColumns: TableColumn<Benchmark>[] = [
               className="tooltip-danger align-middle"
               id={id}
               data-tip={JSON.stringify(httpErrors)}
-              onMouseEnter={() => {
-                ReactTooltip.show(document.getElementById(id)!);
-              }}
-              onMouseLeave={() =>
-                ReactTooltip.hide(document.getElementById(id)!)
-              }
+            // onMouseEnter={() => {
+            //   Tooltip.show(document.getElementById(id)!);
+            // }}
+            // onMouseLeave={() =>
+            //   Tooltip.hide(document.getElementById(id)!)
+            // }
             />
           )}
         </div>
@@ -232,7 +232,7 @@ function BenchmarkResult({ benchmarks }: Props) {
           className="pt-md"
         />
       </div>
-      <ReactTooltip place="right" getContent={HttpErrorsTooltip} />
+      <Tooltip place="right" {...HttpErrorsTooltip} />
       <DataTable
         columns={columns}
         pagination={isMobile}

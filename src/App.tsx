@@ -1,16 +1,14 @@
-import React, { useEffect, useState, lazy, Suspense } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import chroma from "chroma-js";
 import { Benchmark, getBenchmarkData, Hardware } from "./api";
 import {
   QueryParamProvider,
-  transformSearchStringJsonSafe,
 } from "use-query-params";
-import { BrowserRouter as Router, Route } from "react-router-dom";
-import CacheRoute, { CacheSwitch } from "react-router-cache-route";
+import { ReactRouter6Adapter } from 'use-query-params/adapters/react-router-6';
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import Home from "./views/Home";
 import AppHeader from "./components/AppHeader";
-import ScrollToTop from "./components/ScrollToTop";
 
 const BenchmarkResult = lazy(() => import("./views/BenchmarkResult"));
 const CompareFrameworks = lazy(() => import("./views/CompareFramework"));
@@ -57,40 +55,44 @@ function App() {
       new URLSearchParams(window.location.search).get("sha") ?? "master",
       true
     );
+    window.addEventListener('locationchange', function () {
+      window.scrollTo(0, 0);
+    });
+    return () => {
+      window.removeEventListener('locationchange', function () {
+        window.scrollTo(0, 0);
+      })
+    };
   }, []);
 
   return (
-    <Router>
+    <BrowserRouter>
       <QueryParamProvider
-        ReactRouterRoute={Route}
-        stringifyOptions={{
-          transformSearchString: transformSearchStringJsonSafe,
-        }}
+        adapter={ReactRouter6Adapter}
       >
         <div>
           <AppHeader onHistoryChange={fetchBenchmarkData} />
-          <ScrollToTop />
           {isLoading && <div className="loader">Loading...</div>}
           <div className={`container ${isLoading ? "hidden" : ""}`}>
             <Suspense fallback={<div className="loader">Loading...</div>}>
-              <CacheSwitch>
-                <CacheRoute exact path="/">
-                  <Home updateDate={updatedAt} hardware={hardware} />
-                </CacheRoute>
-                <CacheRoute exact path="/result">
-                  <BenchmarkResult benchmarks={benchmarks} />
-                </CacheRoute>
-                <CacheRoute path="/compare">
-                  <CompareFrameworks benchmarks={benchmarks} />
-                </CacheRoute>
-              </CacheSwitch>
+              <Routes>
+                <Route path="/"
+                  element={<Home updateDate={updatedAt} hardware={hardware} />}
+                />
+                <Route path="/result"
+                  element={<BenchmarkResult benchmarks={benchmarks} />}
+                />
+                <Route path="/compare"
+                  element={<CompareFrameworks benchmarks={benchmarks} />}
+                />
+              </Routes>
             </Suspense>
           </div>
           {/* Bottom Space */}
           <div style={{ height: "25vh" }}></div>{" "}
         </div>
       </QueryParamProvider>
-    </Router>
+    </BrowserRouter>
   );
 }
 
